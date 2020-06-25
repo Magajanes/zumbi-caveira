@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerJump : MonoBehaviour
 {
+    public const float INPUT_BUFFER_THRESHOLD = 0.1f;
     public const float JUMP_SUSTAIN_THRESHOLD = 0.25f;
     public const string JUMP_TRIGGER_NAME = "Jump";
 
@@ -24,6 +25,12 @@ public class PlayerJump : MonoBehaviour
     private bool buttonPressed;
     private float _sustainCounter;
     private Touch _touch;
+    private Coroutine inputBuffer;
+
+    private bool InputBuffered
+    {
+        get => inputBuffer != null;
+    }
 
     private bool OnGround
     {
@@ -35,9 +42,22 @@ public class PlayerJump : MonoBehaviour
 #if UNITY_EDITOR
         if (Input.GetButtonDown("Jump"))
         {
-            Jump();
+            if (inputBuffer == null)
+                inputBuffer = StartCoroutine(InputBufferCoroutine());
+        }
+
+        if (InputBuffered)
+        {
+            if (OnGround)
+            {
+                Jump();
+
+                StopCoroutine(inputBuffer);
+                inputBuffer = null;
+            }
         }
 #elif UNITY_ANDROID
+
         if (Input.touchCount > 0)
         {
             _touch = Input.GetTouch(0);
@@ -45,7 +65,20 @@ public class PlayerJump : MonoBehaviour
             if (_touch.phase == TouchPhase.Began)
             {
                 buttonPressed = true;
-                Jump();
+
+                if (inputBuffer == null)
+                    inputBuffer = StartCoroutine(InputBufferCoroutine());
+            }
+
+            if (InputBuffered)
+            {
+                if (OnGround)
+                {
+                    Jump();
+
+                    StopCoroutine(inputBuffer);
+                    inputBuffer = null;
+                }
             }
 
             if (_touch.phase == TouchPhase.Ended)
@@ -58,10 +91,13 @@ public class PlayerJump : MonoBehaviour
 
     private void Jump()
     {
-        if (!OnGround)
-            return;
-
         StartCoroutine(JumpCoroutine());
+    }
+
+    private IEnumerator InputBufferCoroutine()
+    {
+        yield return new WaitForSeconds(INPUT_BUFFER_THRESHOLD);
+        inputBuffer = null;
     }
 
     private IEnumerator JumpCoroutine()
