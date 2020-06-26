@@ -11,6 +11,7 @@ public class CameraFollow : MonoBehaviour
     private Transform target;
 
     [Header("Lerp parameters")]
+    [Range(1, 10)]
     [SerializeField]
     private float lerpTime;
 
