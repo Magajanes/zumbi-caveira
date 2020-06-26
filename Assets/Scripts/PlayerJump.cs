@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerJump : MonoBehaviour
 {
-    public const float INPUT_BUFFER_THRESHOLD = 0.1f;
+    public const float INPUT_BUFFER_THRESHOLD = 0.05f;
     public const float JUMP_SUSTAIN_THRESHOLD = 0.25f;
     public const string JUMP_TRIGGER_NAME = "Jump";
 

@@ -11,7 +11,8 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = -1;
+        QualitySettings.vSyncCount = 0;
 
         if (Instance != null)
             return;
@@ -30,9 +31,9 @@ public class GameManager : MonoBehaviour
     {
         ScenesController.LoadScene(
             "Main",
-            () => 
-            {
+            () => {
                 endLevelPanel.SetActive(false);
-            });
+            }
+        );
     }
 }
